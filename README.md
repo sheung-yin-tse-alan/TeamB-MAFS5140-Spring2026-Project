@@ -34,7 +34,7 @@ The `engine.py` will strictly validate your output at every step. If you violate
 
 ## 🚀 How to Run and Test
 
-1. Ensure you have the provided dataset (e.g., `market_data.parquet`) in your project directory.
+1. Ensure you have the provided dataset in your project directory.
 2. Open your terminal or command prompt.
 3. Run the main script:
    ```bash
