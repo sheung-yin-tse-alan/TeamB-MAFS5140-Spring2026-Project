@@ -36,8 +36,22 @@ class Strategy:
         z_signal = z_signal.rename(index = {'close':'z'})
         reg = pd.DataFrame(index=['reg'], columns = pct_change_df.columns)
         for col in pct_change_df.columns:
-          coeffs = np.polyfit(pct_change_df.shift(1)[-self.lookback_period_reg:][col],pct_change_df[-self.lookback_period_reg:][col],1)
-          reg[col] = coeffs[0]
+          x = pct_change_df[col].shift(1).iloc[-self.lookback_period_reg:]
+          y = pct_change_df[col].iloc[-self.lookback_period_reg:]
+
+          valid = x.notna() & y.notna() & np.isfinite(x) & np.isfinite(y)
+          x = x[valid]
+          y = y[valid]
+
+          if len(x) < 2 or np.isclose(x.std(), 0):
+            reg[col] = np.nan
+            continue
+
+          try:
+            coeffs = np.polyfit(x, y, 1)
+            reg[col] = coeffs[0]
+          except Exception:
+            reg[col] = np.nan
         reg_signal = reg <= self.thres_reg #check if the stock has mean reversion tendency by LM
         signals = pd.concat([z_signal,reg_signal],axis=0)
         #print(signals.sum(axis=1))
